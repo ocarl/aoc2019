@@ -10,6 +10,9 @@ class Node:
         self.children = []
         Node.nodes.append(self)
 
+    def __repr__(self):
+        return self.name + ': ' + ' '.join([x.name for x in self.children])
+
     @staticmethod
     def calc_orbits():
         local_nodes = Node.nodes.copy()
@@ -31,30 +34,34 @@ class Node:
     @staticmethod
     def calc_distance(start, end):
         start = Node.node_factory(start)
-        start.children.append(start.parent)
-        start._pivot()
+        you = Node.node_factory('YOU')
+        you._pivot()
+        end = Node.node_factory(end)
         return start._look_for(end, 0)
 
     def _look_for(self, node, counter):
         if node in self.children:
             return counter
         else:
-            counter += 1
-            local_children = self.children.copy()
-            local_children
             for child in self.children:
-                return child._look_for(node, counter)
+                counter = child._look_for(node, counter)
+                counter += 1
+        return counter
+
 
     def _pivot(self):
-        if not self.children:
-            return
-        if self.parent:
-            self.children.append(self.parent)
-        for child in self.children:
-            child.children.remove(self)
-            child._pivot()
-            child.parent = self
-
+        Node.root = self
+        prev = self
+        self.children.append(self.parent)
+        current = self.parent
+        while current != None:
+            current.children.remove(prev)
+            current.children.append(current.parent)
+            mem = current.parent
+            current.parent = prev
+            prev = current
+            current = mem
+        self.parent = None
 
 
 
@@ -88,6 +95,7 @@ B)G
 G)H
 D)I
 E)J
+J)K
 K)YOU
 I)SAN
 B)C
@@ -96,7 +104,7 @@ C)D
 K)L"""
 
 Node.create_tree(test_in)
-print(Node.calc_distance('YOU', 'SAN'))
+print(Node.calc_distance('D', 'SAN'))
 Node.clear()
 
 with open('input6.txt') as f:
