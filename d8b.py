@@ -16,23 +16,23 @@ def decode_img(image, dim):
 
 assert decode_img(123456789012, (3,2)) == [['123','456'], ['789','012']]
 
-def calc_shit(image, dim):
-    the_layer = None
-    min_zeros = 25
+def make_picture(image, dim):
+    output = [['3']*dim[0]]*dim[1]
     layers = decode_img(image, dim)
+    layers.reverse()
     for layer in layers:
-        zeros = 0
-        for pixel in layer:
-            zeros += sum('0' == x for x in pixel)
-        if zeros < min_zeros:
-            min_zeros = zeros
-            the_layer = layer
-    return sum([sum(x=='2' for x in pixel) for pixel in the_layer])*sum( [sum(x=='1' for x in pixel) for pixel in the_layer])
-
-
-#assert calc_shit(123456789012, (3,2)) == 1
-#assert calc_shit(1234567890120112, (4,2)) == 6
+        for i, pixels in enumerate(layer):
+            for j, pixel in enumerate(pixels):
+                if pixel == '1':
+                    output[i][j] = '1'
+                elif pixel == '0':
+                    output[i][j] = '0'
+    return output
+        
 
 with open('input8.txt') as f:
-    print(calc_shit(f.read(), (25,6)))
+    #raw = make_picture(f.read(), (25,6))
+    raw = make_picture('0222112222120000', (2,2))
+    print(raw)
+    print('\n'.join(''.join(x for x in line) for line in raw))
         
