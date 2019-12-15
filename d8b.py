@@ -1,6 +1,6 @@
 def decode_img(image, dim):
     layers = []
-    image_it = iter(str(image))
+    image_it = iter(image)
     while True:
         try:
             pixels = []
@@ -14,25 +14,30 @@ def decode_img(image, dim):
             break
     return layers
 
-assert decode_img(123456789012, (3,2)) == [['123','456'], ['789','012']]
+assert decode_img(str(123456789012), (3,2)) == [['123','456'], ['789','012']]
 
 def make_picture(image, dim):
-    output = [['3']*dim[0]]*dim[1]
+    length = (dim[0]*dim[1])
+    output = ['3']*length
     layers = decode_img(image, dim)
     layers.reverse()
     for layer in layers:
-        for i, pixels in enumerate(layer):
-            for j, pixel in enumerate(pixels):
+        i = 0
+        for pixels in layer:
+            for pixel in pixels:
                 if pixel == '1':
-                    output[i][j] = '1'
+                    output[i] = '1'
+                    i = (i+1)%length
                 elif pixel == '0':
-                    output[i][j] = '0'
-    return output
-        
+                    output[i] = '0'
+                    i = (i+1)%length
+                else:
+                    i = (i+1)%length
+                    
+    return decode_img(output, dim)[0]
+assert make_picture('0222112222120000', (2,2)) == ['01', '10']
 
 with open('input8.txt') as f:
-    #raw = make_picture(f.read(), (25,6))
-    raw = make_picture('0222112222120000', (2,2))
-    print(raw)
-    print('\n'.join(''.join(x for x in line) for line in raw))
+    raw = make_picture(f.read(), (25,6))
+    print('\n'.join(raw))
         
